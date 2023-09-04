@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+    <title>Candy Stock Management APP</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <header>
+        <h1>Candy Shop</h1>
+    </header>
+
+    <section class="container">
+        <form id="my-form" onsubmit="saveToCloud(event)">
+            <h1>Add a Candy</h1>
+            <div class="candyInputs" id="candyInputs">
+                <label for="candyName">Candy-Name:</label>
+                <input type="text" id="candyName" placeholder="Candy's name" required/>
+                <label for="desc">Description:</label>
+                <input type="text" id="desc" placeholder="Candy's description" required />
+                <label for="price">Price:</label>
+                <input type="text" id="price" placeholder="Candy's price" required/>
+                <label for="name">Quantity:</label>
+                <input type="text" id="quantity" class="quantity" placeholder="Candy's Available quantity" required/>
+                <input class="btn btn-primary" type="submit" value="ADD" />
+            </div>
+        </form>
+
+        <ul id="CandyStockData">
+            <div class="CandyStock" id="CandyStock"></div>
+        </ul>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+    </section>
+    <script src="main.js"></script>
+</body>
+
+</html>
