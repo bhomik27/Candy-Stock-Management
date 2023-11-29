@@ -1,184 +1,196 @@
-function saveToCloud(event) {
-    event.preventDefault();
+async function addToServer(event) {
+    try {
+        event.preventDefault();
 
-    let candyName = event.target.candyName.value;
-    let description = event.target.desc.value;
-    let price = event.target.price.value;
-    let quantity = event.target.quantity.value;
+        // let name = event.target.name.value;
+        // let description = event.target.description.value;
+        // let price = event.target.price.value;
+        // let quantity = event.target.quantity.value;
 
-    let CandyStock = {
-        candyName,
-        description,
-        price,
-        quantity: parseInt(quantity)
-    };
+        let name = document.getElementById('name').value;
+        let description = document.getElementById('description').value;
+        let price = document.getElementById('price').value;
+        let quantity = document.getElementById('quantity').value;
 
-    axios.post("https://crudcrud.com/api/7ca9c3af03fe4bffac142f252f6b9939/CandyStock", CandyStock)
-        .then((response) => {
-            const updatedCandyStock = response.data;
-            printCandyStock(updatedCandyStock);
-            console.log(response);
-        })
-        .catch((err) => {
-            console.error(err);
-        });
+
+        let Stock = {
+            name,
+            description,
+            price,
+            quantity
+        };
+
+        const response = await axios.post("//localhost:3000/stock/add-stock", Stock);
+        const updatedStock = response.data;
+        printStock(updatedStock);
+        console.log(response);
+
+
+        // Reset input fields
+        document.getElementById('my-form').reset();
+
+    } catch (err) {
+        console.error(err);
+    }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-    axios.get("https://crudcrud.com/api/7ca9c3af03fe4bffac142f252f6b9939/CandyStock")
-        .then((response) => {
-            console.log(response);
+window.addEventListener("DOMContentLoaded", async () => {
+    try {
+        const response = await axios.get("http://localhost:3000/stock/stocks");
+        console.log(response.data);
 
-            for (var i = 0; i < response.data.length; i++) {
-                printCandyStock(response.data[i]);
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-        });
+        for (let i = 0; i < response.data.length; i++) {
+            printStock(response.data[i]);
+        }
+    } catch (error) {
+        console.log(error);
+    }
 });
 
-function printCandyStock(CandyStock) {
-    const parentElement = document.getElementById('CandyStock');
+function printStock(stock) {
+    const parentElement = document.getElementById('stocks');
     const childElement = document.createElement('li');
-    childElement.id = CandyStock._id; // Set the ID here
-
-    const candyContainer = document.createElement('div');
+    childElement.id = `${stock.id}`;
 
     childElement.innerHTML = `
-    Candy-Name: ${CandyStock.candyName} <br>
-    Description: ${CandyStock.description} <br>
-    Price: ${CandyStock.price} <br>
-    <span class="quantity">Quantity: ${CandyStock.quantity}</span>
-`;
+        Item-Name: ${stock.name} <br>
+        Description: ${stock.description} <br>
+        Price: ${stock.price} <br>
+        <span class="quantity">Quantity: ${stock.quantity}</span>
+    `;
+
+    const createButton = (id, text, onClick) => {
+        const button = document.createElement('button');
+        button.id = id;
+        button.className = 'btn btn-primary';
+        button.textContent = text;
+        button.style.fontWeight = 'bold';
+        button.onclick = onClick;
+        return button;
+    };
 
 
-    //buy 1 Button
-    const buyOneButton = document.createElement('button')
-    buyOneButton.id = 'buy1';
-    buyOneButton.className = "btn btn-primary";
-    buyOneButton.textContent = "Buy One"
-    buyOneButton.style.fontWeight = "bold";
+
+    const deleteButton = createButton('delete', 'Delete', () => deleteItem(stock.id));
+    const editButton = createButton('edit', 'Edit', () => editItem(stock.id));
+
+    deleteButton.style.backgroundColor = 'red';
+    editButton.style.backgroundColor = 'green';
 
 
-    //buy 2 Button
-    const buyTwoButton = document.createElement('button')
-    buyTwoButton.id = 'buy2';
-    buyTwoButton.className = "btn btn-primary";
-    buyTwoButton.textContent = "Buy Two"
-    buyTwoButton.style.fontWeight = "bold";
+    const buyButton = (quantity) => {
+        return createButton(`buy${quantity}`, `Buy ${quantity}`, () => updateItemStock(stock.id, -quantity));
+    };
 
-
-    //buy 3 Button
-    const buyThreeButton = document.createElement('button')
-    buyThreeButton.id = 'buy3';
-    buyThreeButton.className = "btn btn-primary";
-    buyThreeButton.textContent = "Buy Three"
-    buyThreeButton.style.fontWeight = "bold";
-
-    //CLICK EVENTS
-    buyOneButton.onclick = () => removeOne(CandyStock._id, CandyStock.description, CandyStock.candyName, CandyStock.price);
-    buyTwoButton.onclick = () => removeTwo(CandyStock._id, CandyStock.description, CandyStock.candyName, CandyStock.price);
-    buyThreeButton.onclick = () => removeThree(CandyStock._id, CandyStock.description, CandyStock.candyName, CandyStock.price);
-
-    // Create the delete button
-    const deleteButton = document.createElement('button');
-    deleteButton.id = 'delete';
-    deleteButton.className = 'btn btn-danger';
-    deleteButton.textContent = 'Delete';
-    deleteButton.style.backgroundColor = "red";
-    deleteButton.style.fontWeight = 'bold';
-
-    // Set the onclick event to call deleteCandy with the candy's ID
-    deleteButton.onclick = () => deleteCandy(CandyStock._id);
-
-    // Append the delete button to the child element
     childElement.appendChild(deleteButton);
+    childElement.appendChild(editButton);
+    childElement.appendChild(buyButton(1));
+    childElement.appendChild(buyButton(2));
+    childElement.appendChild(buyButton(3));
 
-
-
-    childElement.appendChild(buyOneButton);
-    childElement.appendChild(buyTwoButton);
-    childElement.appendChild(buyThreeButton);
-    childElement.appendChild(candyContainer);
     parentElement.appendChild(childElement);
 }
 
-function removeOne(_id, description, candyName, price) {
-    updateCandyStock(_id, -1, description, candyName, price);
-}
 
-function removeTwo(_id, description, candyName, price) {
-    updateCandyStock(_id, -2, description, candyName, price);
-}
+async function updateItemStock(id, quantityChange) {
+    try {
+        const response = await axios.get(`http://localhost:3000/stock/${id}`);
+        const stockData = response.data;
 
-function removeThree(_id, description, candyName, price) {
-    updateCandyStock(_id, -3, description, candyName, price);
-}
+        const currentQuantity = parseInt(stockData.quantity);
+        const newQuantity = currentQuantity + quantityChange;
 
-function deleteCandy(_id) {
-    // Make a DELETE request to remove the candy from the server
-    axios
-        .delete(`https://crudcrud.com/api/7ca9c3af03fe4bffac142f252f6b9939/CandyStock/${_id}`)
-        .then(() => {
-            // Remove the candy element from the frontend
-            const candyElement = document.getElementById(`${_id}`);
-            if (candyElement) {
-                candyElement.remove();
-            } else {
-                console.error(`Candy with ID ${_id} not found on the frontend.`);
+        if (newQuantity >= 0) {
+            // Updated format to match the server's expected structure
+            const updatedItemData = {
+                quantityChange: quantityChange // Sending just the change in quantity
+            };
+
+            try {
+                await axios.put(`http://localhost:3000/stock/${id}`, updatedItemData);
+
+                const stockElement = document.getElementById(`${id}`);
+
+                if (stockElement) {
+                    const quantityElement = stockElement.querySelector('.quantity');
+                    if (quantityElement) {
+                        quantityElement.textContent = `Quantity: ${newQuantity}`;
+                    } else {
+                        console.error(`Quantity element not found within stock element with ID ${id}`);
+                    }
+                } else {
+                    console.error(`Item with ID ${id} not found on the frontend.`);
+                }
+            } catch (updateError) {
+                console.error(`Error updating item with ID ${id}: ${updateError.message}`);
             }
-        })
-        .catch((error) => {
-            console.error(`Error deleting candy with ID ${_id} from the server:`, error);
-        });
+        } else {
+            console.error(`Insufficient quantity for item with ID ${id}`);
+        }
+    } catch (error) {
+        console.error(`Error fetching item with ID ${id}: ${error.message}`);
+    }
 }
 
 
 
 
-function updateCandyStock(_id, quantityChange, description, candyName, price) {
-    // Make a GET request to fetch the candy data by ID
-    axios.get(`https://crudcrud.com/api/7ca9c3af03fe4bffac142f252f6b9939/CandyStock/${_id}`)
-        .then((response) => {
-            const candyData = response.data;
-            const currentQuantity = parseInt(candyData.quantity);
-            const newQuantity = currentQuantity + quantityChange;
+async function deleteItem(id) {
+    try {
+        await axios.delete(`http://localhost:3000/stock/delete-stock/${id}`);
 
-            if (newQuantity >= 0) {
-                // Prepare the updated candy data
-                const updatedCandyData = {
-                    candyName: candyName,
-                    description: description,
-                    price: price,
-                    quantity: newQuantity
-                };
+        const stockItem = document.getElementById(`${id}`);
+        if (stockItem) {
+            stockItem.remove();
+        } else {
+            console.error(`Item with ID ${id} not found on the frontend.`);
+        }
+    } catch (error) {
+        console.error(`Error deleting item with ID ${id} from the server:`, error); d
+    }
+}
 
-                // Make a PUT request to update the candy data on the server
-                axios.put(`https://crudcrud.com/api/7ca9c3af03fe4bffac142f252f6b9939/CandyStock/${_id}`, updatedCandyData)
-                    .then(() => {
-                        // Update the candy's quantity on the frontend if the element exists
-                        const candyElement = document.getElementById(`${_id}`);
-                        if (candyElement) {
-                            const quantityElement = candyElement.querySelector('.quantity');
-                            if (quantityElement) {
-                                quantityElement.textContent = `Quantity: ${newQuantity}`;
-                            } else {
-                                console.error(`Quantity element not found within candy element with ID ${_id}`);
-                            }
-                        } else {
-                            console.error(`Candy with ID ${_id} not found on the frontend.`);
-                        }
-                    })
-                    .catch((error) => {
-                        console.error(`Error updating candy with ID ${_id} on the server:`, error);
-                    });
-            } else {
-                // Handle insufficient quantity error more gracefully
-                console.error(`Insufficient quantity for candy with ID ${_id}`);
-            }
-        })
-        .catch((error) => {
-            console.error(`Error fetching candy with ID ${_id} from the server:`, error);
-        });
+
+async function editItem(id) {
+    try {
+        const response = await axios.get(`http://localhost:3000/stock/edit-stock/${id}`);
+        const stockData = response.data;
+
+        console.log('Initial Item Name:', stockData.name);
+    
+        const newItemName = prompt('Enter new item name:', stockData.name);
+        console.log('New Item Name from Prompt:', newItemName);
+        const newDescription = prompt('Enter new description:', stockData.description);
+        const newPrice = prompt('Enter new price:', stockData.price);
+        const newQuantity = prompt('Enter new quantity:', stockData.quantity);
+
+        const updatedStock = {
+            name: newItemName ,
+            description: newDescription || stockData.description,
+            price: newPrice || stockData.price,
+            quantity: newQuantity || stockData.quantity,
+        };
+
+        console.log('Updated Item Name:', updatedStock.name);
+
+
+        await axios.put(`http://localhost:3000/stock/edit-stock/${id}`, updatedStock);
+
+        const stockItem = document.getElementById(`${id}`);
+        if (stockItem) {
+            // stockItem.innerHTML = `
+            //     Item-Name: ${updatedStock.name} <br>
+            //     Description: ${updatedStock.description} <br>
+            //     Price: ${updatedStock.price} <br>
+            //     <span class="quantity">Quantity: ${updatedStock.quantity}</span>
+            deleteItem(stockData.id);
+            // `;
+            printStock(updatedStock);
+            
+        } else {
+            console.error(`Item with ID ${id} not found on the frontend.`);
+        }
+    } catch (error) {
+        console.error(`Error updating item with ID ${id} on the server:`, error);
+    }
 }

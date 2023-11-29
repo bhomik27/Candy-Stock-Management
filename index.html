@@ -10,33 +10,33 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
         crossorigin="anonymous"></script>
-    <title>Candy Stock Management APP</title>
+    <title>Stock Management APP</title>
     <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
     <header>
-        <h1>Candy Shop</h1>
+        <h1>Inventory Manager</h1>
     </header>
 
     <section class="container">
-        <form id="my-form" onsubmit="saveToCloud(event)">
-            <h1>Add a Candy</h1>
-            <div class="candyInputs" id="candyInputs">
-                <label for="candyName">Candy-Name:</label>
-                <input type="text" id="candyName" placeholder="Candy's name" required/>
-                <label for="desc">Description:</label>
-                <input type="text" id="desc" placeholder="Candy's description" required />
+        <form id="my-form" onsubmit="addToServer(event)">
+            <h1>Add an Item</h1>
+            <div class="itemInputs" id="itemInputs">
+                <label for="name">item-Name:</label>
+                <input type="text" id="name" placeholder="item's name" required/>
+                <label for="description">Description:</label>
+                <input type="text" id="description" placeholder="item's description" required />
                 <label for="price">Price:</label>
-                <input type="text" id="price" placeholder="Candy's price" required/>
-                <label for="name">Quantity:</label>
-                <input type="text" id="quantity" class="quantity" placeholder="Candy's Available quantity" required/>
+                <input type="text" id="price" placeholder="item's price" required/>
+                <label for="quantity">Quantity:</label>
+                <input type="text" id="quantity" class="quantity" placeholder="item's Available quantity" required/>
                 <input class="btn btn-primary" type="submit" value="ADD" />
             </div>
         </form>
 
-        <ul id="CandyStockData">
-            <div class="CandyStock" id="CandyStock"></div>
+        <ul id="stocks">
+            <div class="itemStock" id="itemStock"></div>
         </ul>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
